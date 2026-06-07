@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Heart Viewer</title>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #000;
+      font-family: sans-serif;
+    }
+
+    .html-label {
+      position: absolute;
+      color: #fff;
+      font-size: 14px;
+      background: rgba(0,0,0,0.6);
+      padding: 2px 6px;
+      border-radius: 4px;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      white-space: nowrap;
+    }
+
+    .ui-box {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      z-index: 20;
+      background: #0008;
+      padding: 10px;
+      border-radius: 8px;
+      color: white;
+      font-size: 14px;
+    }
+
+    .ui-button {
+      padding: 6px 12px;
+      margin-top: 8px;
+      background: #0af;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 120px;
+    }
+  </style>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/OBJLoader.js"></script>
+</head>
+
+<body>
+
+  <div id="canvas-container" style="width:100vw; height:100vh;"></div>
+
+  <div class="ui-box">
+    <div>
+      心臓透明度
+      <input id="heart-opacity" type="range" min="0" max="1" step="0.01" value="0.3">
+    </div>
+
+    <div style="margin-top:8px;">
+      冠動脈透明度
+      <input id="coronary-opacity" type="range" min="0" max="1" step="0.01" value="1">
+    </div>
+
+    <button id="view-A" class="ui-button">正面</button>
+    <button id="toggle-heart" class="ui-button">心臓 ON/OFF</button>
+  </div>
+
+   <!-- ★ 追加するボタン -->
+  <button id="toggle-labels" class="ui-button">ラベル ON/OFF</button>
+</div>
+
+  <script src="main.js"></script>
+
+</body>
+</html>
