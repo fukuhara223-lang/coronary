@@ -303,30 +303,49 @@ const lcaData = `【左前下行枝 (LAD)】
 【#15】後下行枝（PD）`;
 
 // ==========================================
-// ボタンのクリックイベント設定
+// ボタンのクリックイベント設定（トグル対応版）
 // ==========================================
 const infoDisplay = document.getElementById("info-display");
 const infoTitle = document.getElementById("info-title");
 const infoContent = document.getElementById("info-content");
 
+// 現在どの状態が表示されているかを記録する変数
+let currentView = "none"; 
+
 // RCA（右冠動脈）ボタンを押したとき
 document.getElementById("btn-rca").addEventListener("click", () => {
-    infoTitle.innerText = "右冠動脈（RCA）番地一覧";
-    infoContent.innerText = rcaData;
-    infoDisplay.style.display = "block"; // 画面に表示
+    // すでにRCAが表示されているなら閉じる
+    if (infoDisplay.style.display === "block" && currentView === "RCA") {
+        infoDisplay.style.display = "none";
+        currentView = "none";
+    } else {
+        // 表示されておらず、またはLCAから切り替える場合
+        infoTitle.innerText = "右冠動脈（RCA）番地一覧";
+        infoContent.innerText = rcaData;
+        infoDisplay.style.display = "block";
+        currentView = "RCA";
+    }
 });
 
 // LCA（左冠動脈）ボタンを押したとき
 document.getElementById("btn-lca").addEventListener("click", () => {
-    infoTitle.innerText = "左冠動脈（LCA）番地一覧";
-    infoContent.innerText = lcaData;
-    infoDisplay.style.display = "block"; // 画面に表示
+    // すでにLCAが表示されているなら閉じる
+    if (infoDisplay.style.display === "block" && currentView === "LCA") {
+        infoDisplay.style.display = "none";
+        currentView = "none";
+    } else {
+        // 表示されておらず、またはRCAから切り替える場合
+        infoTitle.innerText = "左冠動脈（LCA）番地一覧";
+        infoContent.innerText = lcaData;
+        infoDisplay.style.display = "block";
+        currentView = "LCA";
+    }
 });
 
-// 3D画面のどこかを触ったら解説を閉じる（お好みで）
+// 背景を触ったら閉じる機能も、便利なのでそのまま残してあります
 window.addEventListener("click", (e) => {
-    // クリックしたのがボタンや解説エリア以外なら閉じる
     if (!e.target.closest('.ui-button') && !e.target.closest('#info-display')) {
         infoDisplay.style.display = "none";
+        currentView = "none";
     }
 });
