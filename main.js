@@ -279,3 +279,54 @@ function animate() {
 }
 
 animate();
+// ==========================================
+// 冠動脈AHAセグメント解説データ
+// ==========================================
+const rcaData = `【#1】右冠動脈起始部から鋭縁部までを2等分した近位部。通常は、右室枝（RV）の起始部と一致する
+【#2】右冠動脈起始部から鋭縁部までを2等分した遠位部。通常は、右室枝起始部から鋭縁枝（AM）の起始部と一致する
+【#3】鋭縁枝から後下行枝（PD）まで
+【#4】後下行枝から右冠動脈の末梢。房室結節枝があるものを #4AV、後下行枝を 4PD と呼ぶ`;
+
+const lcaData = `【左前下行枝 (LAD)】
+【#5】左冠動脈主幹部（LMT）
+【#6】左冠動脈主幹部から前下行枝の第1中隔枝（first major septal branch）まで
+【#7】第1中隔枝から第2対角枝（D2）まで
+【#8】第2対角枝から左前下行枝まで
+【#9】第1対角枝（D1）
+【#10】第2対角枝（D2）
+
+【左回旋枝 (LCX)】
+【#11】回旋枝の鈍角枝（OM）まで
+【#12】鈍角枝（OM）
+【#13】鈍角枝から後側壁枝（PL）まで
+【#14】後側壁枝（PL）
+【#15】後下行枝（PD）`;
+
+// ==========================================
+// ボタンのクリックイベント設定
+// ==========================================
+const infoDisplay = document.getElementById("info-display");
+const infoTitle = document.getElementById("info-title");
+const infoContent = document.getElementById("info-content");
+
+// RCA（右冠動脈）ボタンを押したとき
+document.getElementById("btn-rca").addEventListener("click", () => {
+    infoTitle.innerText = "右冠動脈（RCA）番地一覧";
+    infoContent.innerText = rcaData;
+    infoDisplay.style.display = "block"; // 画面に表示
+});
+
+// LCA（左冠動脈）ボタンを押したとき
+document.getElementById("btn-lca").addEventListener("click", () => {
+    infoTitle.innerText = "左冠動脈（LCA）番地一覧";
+    infoContent.innerText = lcaData;
+    infoDisplay.style.display = "block"; // 画面に表示
+});
+
+// 3D画面のどこかを触ったら解説を閉じる（お好みで）
+window.addEventListener("click", (e) => {
+    // クリックしたのがボタンや解説エリア以外なら閉じる
+    if (!e.target.closest('.ui-button') && !e.target.closest('#info-display')) {
+        infoDisplay.style.display = "none";
+    }
+});
