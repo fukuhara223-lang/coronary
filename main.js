@@ -61,15 +61,15 @@ function adjustGroupPosition() {
 // 6. 正面ビュー
 // ===============================
 function resetToFront() {
-    camera.position.set(0, -modelSize * 1.3, modelSize * 0.2);
+    camera.position.set(0, -modelSize * 1.8, modelSize * 0.2);
     controls.target.set(0, 0, 0);
     controls.update();
 }
 
 // ===============================
-// 7. OBJ読み込み
+// 7. GLB読み込み (修正版)
 // ===============================
-const loader = new THREE.OBJLoader();
+const loader = new THREE.GLTFLoader(); 
 let loaded = 0;
 
 function checkLoaded() {
@@ -77,34 +77,47 @@ function checkLoaded() {
     if (loaded === 2) adjustGroupPosition();
 }
 
-loader.load("models/heart.obj", obj => {
-    heartMesh = obj;
-    obj.traverse(c => {
+// ---- heart.glb ----
+loader.load("models/heart.glb", gltf => {
+    heartMesh = gltf.scene; 
+
+    heartMesh.traverse(c => {
         if (c.isMesh) {
-            c.material = new THREE.MeshStandardMaterial({
-                color: 0xffcccc,
-                transparent: true,
-                opacity: 0.3
-            });
+            // クローンを作るか、元のマテリアルのプロパティを直接書き換えます
+            c.material = c.material.clone(); // 他のメッシュとの干渉を防ぐためクローン
+            c.material.transparent = true;
+            c.material.opacity = 0.3;
+            c.material.color.setHex(0xffcccc); 
+            
+            // 【重要】裏面も描画するように設定（表示が欠けるのを防ぐ）
+            c.material.side = THREE.DoubleSide; 
         }
     });
-    heartGroup.add(obj);
+
+    heartGroup.add(heartMesh);
     checkLoaded();
+}, undefined, error => {
+    console.error("heart.glbの読み込みに失敗しました:", error);
 });
 
-loader.load("models/coronary.obj", obj => {
-    coronaryMesh = obj;
-    obj.traverse(c => {
+// ---- coronary.glb ----
+loader.load("models/coronary.glb", gltf => {
+    coronaryMesh = gltf.scene; 
+
+    coronaryMesh.traverse(c => {
         if (c.isMesh) {
-            c.material = new THREE.MeshStandardMaterial({
-                color: 0xff0000,
-                transparent: true,
-                opacity: 1.0
-            });
+            c.material = c.material.clone();
+            c.material.transparent = true;
+            c.material.opacity = 1.0;
+            c.material.color.setHex(0xff0000); 
+            c.material.side = THREE.DoubleSide;
         }
     });
-    heartGroup.add(obj);
+
+    heartGroup.add(coronaryMesh);
     checkLoaded();
+}, undefined, error => {
+    console.error("coronary.glbの読み込みに失敗しました:", error);
 });
 
 // ===============================
@@ -135,7 +148,7 @@ document.getElementById("toggle-heart").addEventListener("click", () => {
 });
 
 // ===============================
-// 11. ラベル（ピンあり）
+// 11. ラベル
 // ===============================
 const labelElements = [];
 
@@ -156,7 +169,7 @@ function createAhaLabel(name, x, y, z) {
 }
 
 // ===============================
-// 12. あなたの座標
+// 12. 座標
 // ===============================
 createAhaLabel("#1", -42, -12, 16);
 createAhaLabel("#2", -59, -24, -12);
@@ -176,22 +189,12 @@ createAhaLabel("#13", 26, 46, 0);
 createAhaLabel("#14", 45, 25, -22);
 
 // ===============================
-// ===============================
-// ===============================
-// ===============================
-// ===============================
-// ===============================
-// ===============================
-// ===============================
-// ===============================
-// ===============================
-// 13. ナビゲーションサイコロ（AとPの上下反転を解除版）
+// 13. ナビゲーションサイコロ
 // ===============================
 const cubeScene = new THREE.Scene();
 const cubeCamera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
 cubeCamera.position.set(0, 0, 40);
 
-// ★ 文字の回転・反転に対応した makeFace()
 function makeFace(label, color, rotate = 0, flipX = false, flipY = false) {
     const c = document.createElement("canvas");
     c.width = c.height = 256;
@@ -218,76 +221,19 @@ function makeFace(label, color, rotate = 0, flipX = false, flipY = false) {
     return new THREE.CanvasTexture(c);
 }
 
-/*
-Three.js BoxGeometry の面の順番：
- 0: +X（右）
- 1: -X（左）
- 2: +Y（奥）
- 3: -Y（手前）
- 4: +Z（上）
- 5: -Z（下）
-
-あなたの表記ルール：
- +X → L
- -X → R
- +Y → P（Superior）
- -Y → A（Inferior）
- +Z → H（Front）
- -Z → F（Back）
-
-今回の調整：
- A：上下反転 → 解除（flipY=false）
- P：上下反転 → 解除（flipY=false）
- F：左右反転 → 維持（flipX=true）
- R：+90°回転 → 維持
- L：-90°回転 → 維持
-*/
-
 const navCube = new THREE.Mesh(
     new THREE.BoxGeometry(20, 20, 20),
     [
-        // +X → L（右側） → -90°回転
-        new THREE.MeshBasicMaterial({
-            map: makeFace("L", "#1e88e5", -Math.PI / 2)
-        }),
-
-        // -X → R（左側） → +90°回転
-        new THREE.MeshBasicMaterial({
-            map: makeFace("R", "#43a047", Math.PI / 2)
-        }),
-
-        // +Y → P（Superior） → ★180°回転で上下を正す★
-        new THREE.MeshBasicMaterial({
-            map: makeFace("P", "#fdd835", Math.PI)
-        }),
-
-           // -Y → A（Inferior） → ★上下反転なし★
-        new THREE.MeshBasicMaterial({
-            map: makeFace("A", "#fb8c00")
-        }),
-
-        // +Z → H（Front） → そのまま
-        new THREE.MeshBasicMaterial({
-            map: makeFace("H", "#e53935")
-        }),
-
-        // -Z → F（Back） → 左右反転
-        new THREE.MeshBasicMaterial({
-            map: makeFace("F", "#8e24aa", 0, true,true)
-        })
+        new THREE.MeshBasicMaterial({ map: makeFace("L", "#1e88e5", -Math.PI / 2) }),
+        new THREE.MeshBasicMaterial({ map: makeFace("R", "#43a047", Math.PI / 2) }),
+        new THREE.MeshBasicMaterial({ map: makeFace("P", "#fdd835", Math.PI) }),
+        new THREE.MeshBasicMaterial({ map: makeFace("A", "#fb8c00") }),
+        new THREE.MeshBasicMaterial({ map: makeFace("H", "#e53935") }),
+        new THREE.MeshBasicMaterial({ map: makeFace("F", "#8e24aa", 0, true, true) })
     ]
 );
 
-
 cubeScene.add(navCube);
-
-// ★ 医療ビューア方式：カメラの逆回転を適用
-function updateCubeRotation() {
-    navCube.quaternion.copy(camera.quaternion).invert();
-}
-
-cubeScene.add(navCube);
-
 
 // ===============================
 // 14. リサイズ
@@ -305,7 +251,6 @@ function animate() {
     requestAnimationFrame(animate);
     controls.update();
 
-    // ラベル追従
     labelElements.forEach(l => {
         const wp = l.pin.position.clone().project(camera);
         if (wp.z > 1) { l.el.style.display = "none"; return; }
@@ -314,15 +259,12 @@ function animate() {
         l.el.style.top = `${(-(wp.y * 0.5) + 0.5) * window.innerHeight}px`;
     });
 
-    // ★ メインビュー描画
     renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.setScissorTest(false);
     renderer.render(scene, camera);
 
-    // ★ サイコロの向きをカメラの逆回転に同期（医療ビューア方式）
     navCube.quaternion.copy(camera.quaternion).invert();
 
-    // ★ 右下サイコロ描画
     const size = 140;
     const margin = 10;
     const x = window.innerWidth - size - margin;
@@ -335,4 +277,5 @@ function animate() {
 
     renderer.setScissorTest(false);
 }
+
 animate();

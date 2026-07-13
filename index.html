@@ -5,65 +5,94 @@
   <title>Heart Viewer</title>
 
   <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      background: #000;
-      font-family: sans-serif;
-    }
+  body {
+    margin: 0;
+    overflow: hidden;
+    background: #000;
+    font-family: sans-serif;
+  }
 
-    .html-label {
-      position: absolute;
-      color: #fff;
-      font-size: 14px;
-      background: rgba(0,0,0,0.6);
-      padding: 2px 6px;
-      border-radius: 4px;
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-      white-space: nowrap;
-    }
+  /* 3D上の文字ラベル */
+  .html-label {
+    position: absolute;
+    color: #fff;
+    font-size: 14px;
+    background: rgba(0,0,0,0.6);
+    padding: 2px 6px;
+    border-radius: 4px;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+  }
 
-    .ui-box {
-      position: fixed;
-      top: 10px;
-      left: 10px;
-      z-index: 20;
-      background: #0008;
-      padding: 10px;
-      border-radius: 8px;
-      color: white;
-      font-size: 14px;
-    }
+  /* 【左下】スライダーとボタンをすべてまとめるコンテナ */
+  .ui-container-left-bottom {
+    position: fixed;
+    bottom: 20px;
+    left: 15px;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.65); /* 背景を少し濃くして視認性アップ */
+    padding: 14px;
+    border-radius: 10px;
+    color: white;
+    font-size: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* 各要素の隙間 */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+  }
+  
+  /* スライダー全体のレイアウト */
+  .slider-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
 
-    .ui-button {
-      padding: 6px 12px;
-      margin-top: 8px;
-      background: #0af;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      width: 120px;
-    }
+  .ui-container-left-bottom input[type="range"] {
+    width: 140px; /* ボタンの横幅と統一して綺麗に見せる */
+    margin: 2px 0;
+    cursor: pointer;
+  }
+
+  /* 【ボタン単体】元のデザインベースで少し大きめ */
+  .ui-button {
+    padding: 10px 16px;
+    background: #0af;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    width: 140px;
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+  }
   </style>
 
+  <!-- three.js（非module版） -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  <!-- OrbitControls（非module版） -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/OBJLoader.js"></script>
+
+  <!-- GLTFLoader（非module版） -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/GLTFLoader.js"></script>
+
 </head>
 
 <body>
 
+
   <div id="canvas-container" style="width:100vw; height:100vh;"></div>
 
-  <div class="ui-box">
-    <div>
+  <div class="ui-container-left-bottom">
+    <div class="slider-group">
       心臓透明度
       <input id="heart-opacity" type="range" min="0" max="1" step="0.01" value="0.3">
     </div>
 
-    <div style="margin-top:8px;">
+    <div class="slider-group">
       冠動脈透明度
       <input id="coronary-opacity" type="range" min="0" max="1" step="0.01" value="1">
     </div>
@@ -71,10 +100,6 @@
     <button id="view-A" class="ui-button">正面</button>
     <button id="toggle-heart" class="ui-button">心臓 ON/OFF</button>
   </div>
-
-   <!-- ★ 追加するボタン -->
-  <button id="toggle-labels" class="ui-button">ラベル ON/OFF</button>
-</div>
 
   <script src="main.js"></script>
 
