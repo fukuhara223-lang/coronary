@@ -104,11 +104,8 @@
   </style>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-
   <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/controls/OrbitControls.js"></script>
-
   <script src="https://cdn.jsdelivr.net/npm/three@0.128/examples/js/loaders/GLTFLoader.js"></script>
-
 </head>
 
 <body>
@@ -138,7 +135,30 @@
     <button id="btn-lca" class="ui-button" style="background: #2ecc71;">LCA番地</button>
   </div>
 
-  <script src="main.js"></script>
+  <!-- パスワード認証機能 -->
+  <script>
+    const CORRECT_PASSWORD = "heart2026"; 
+
+    // 画面を開いた瞬間にパスワード入力を求める
+    const userPassword = prompt("【来場者限定特典】\nサンクスカードに記載されているパスワードを入力してください：");
+
+    if (userPassword !== CORRECT_PASSWORD) {
+        // パスワードが違う、またはキャンセルされた場合
+        alert("パスワードが正しくありません。");
+        // 画面を真っ白にしてUIもすべて非表示にする
+        document.body.innerHTML = `
+          <div style="color: white; text-align: center; padding-top: 40vh; font-family: sans-serif; background: #000; width: 100vw; height: 100vh;">
+            <h2>アクセス権限がありません</h2>
+            <p>正しいパスワードを入力してページを再読み込みしてください。</p>
+          </div>
+        `;
+    } else {
+        // パスワードが合っていれば、本来の3Dビューワープログラム（main.js）を読み込む
+        const script = document.createElement("script");
+        script.src = "main.js";
+        document.body.appendChild(script);
+    }
+  </script>
 
 </body>
 </html>
